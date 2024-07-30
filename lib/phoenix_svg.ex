@@ -84,7 +84,7 @@ defmodule PhoenixSVG do
       |> PhoenixSVG.Helpers.to_safe_html_attrs()
 
     assigns = %{
-      inner_content: raw(["<svg ", html_attrs, String.trim(tail)])
+      inner_content: raw(["<svg ", html_attrs, String.trim(tail) |> replace_within_file(Map.get(assigns, :replace), Map.get(assigns, :replace_with))])
     }
 
     ~H"""
@@ -104,4 +104,10 @@ defmodule PhoenixSVG do
   Any other attributes will be passed through to the SVG tag.
   """
   @callback svg(assigns :: map) :: Phoenix.LiveView.Rendered.t()
+
+  def replace_within_file(file, nil, _val), do: file
+  def replace_within_file(file, replace, replace_with) do
+    file
+    |> String.replace("<%= #{replace} %>", replace_with)
+  end
 end
